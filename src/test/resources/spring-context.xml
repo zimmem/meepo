@@ -48,6 +48,7 @@
 
 	<bean class="com.zimmem.meepo.sample.SelectService"></bean>
 
+	<aop:aspectj-autoproxy proxy-target-class="true" />
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="get*" read-only="true" />
@@ -55,9 +56,20 @@
 			<tx:method name="*" propagation="REQUIRED" />
 		</tx:attributes>
 	</tx:advice>
-	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<bean id="enforceMasterStrategy" class="com.zimmem.meepo.EnforceMasterStrategy">
+		<property name="dataSourceWrapper" ref="dataSource" />
+	</bean>
+
 	<aop:config>
 		<aop:pointcut id="allManagerMethod" expression="execution(* com.zimmem.meepo.sample.SelectService.*(..))" />
 		<aop:advisor pointcut-ref="allManagerMethod" advice-ref="txAdvice" />
+		<aop:aspect id="enforceMasterAspect" ref="enforceMasterStrategy" order="0">
+			<aop:around method="invoke" pointcut-ref="enforceMasterMethod" />
+			<aop:pointcut id="enforceMasterMethod" expression="execution(* com.zimmem.meepo.sample.SelectService.*(..))" />
+		</aop:aspect>
 	</aop:config>
+
+
+
+
 </beans>

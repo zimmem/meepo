@@ -5,6 +5,10 @@ import java.util.UUID;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 
+/**
+ * 
+ * @author zhaowen.zhuang
+ */
 public class MeepoDataSourceTransactionManager extends DataSourceTransactionManager {
 
     private static final long serialVersionUID = -5398456201969702443L;
@@ -21,7 +25,7 @@ public class MeepoDataSourceTransactionManager extends DataSourceTransactionMana
         if (this.dataSourceWrapper == null) {
             throw new IllegalArgumentException("Property 'dataSourceWrapper' is required");
         }
-        super.setDataSource(getDataSourceWrapper());
+        super.setDataSource(dataSourceWrapper);
         super.afterPropertiesSet();
     }
 

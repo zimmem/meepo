@@ -14,6 +14,10 @@ import javax.sql.DataSource;
 
 import com.zimmem.meepo.MasterSlaveStrategy.Role;
 
+/**
+ * 
+ * @author zhaowen.zhuang
+ */
 public class DataSourceWrapper implements DataSource {
 
     private DataSource masterDataSource;
@@ -39,7 +43,7 @@ public class DataSourceWrapper implements DataSource {
 
     void clear(String clearKey) {
         if (clearKey != null && clearKey.equals(this.clearKey.get())) {
-            dataSorceHolder.remove();
+            this.dataSorceHolder.remove();
             this.clearKey.remove();
         }
     }
