@@ -30,4 +30,5 @@ Meepo 是怎么实现的？
 - `EnforceMasterStrategy` 通过 AOP 实现， 当 service 方法上带有 `@EnforceMaster` 注解时， 强制分配主库， 否则分配从库  
 以上两个策略一般配合使用， 如需自定义策略， 可实现 `MasterSlaveStrategy` 接口。
 
+具体应用可看单元测试及 `src/test/resources` 目录下的配置
  
