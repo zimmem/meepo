@@ -1,0 +1,1 @@
+insert into test_table(id, name) values(1, 'slave1');

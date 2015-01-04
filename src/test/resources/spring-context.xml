@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/jdbc
+        http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="no">
+	<jdbc:embedded-database type="H2" id="masterDatasource">
+		<jdbc:script location="schema.sql" />
+		<jdbc:script location="master.sql" />
+	</jdbc:embedded-database>
+	<jdbc:embedded-database type="H2" id="slaveDatasource1">
+		<jdbc:script location="schema.sql" />
+		<jdbc:script location="slave1.sql" />
+	</jdbc:embedded-database>
+	<jdbc:embedded-database type="H2" id="slaveDatasource2">
+		<jdbc:script location="schema.sql" />
+		<jdbc:script location="slave2.sql" />
+	</jdbc:embedded-database>
+
+	<bean id="dataSource" class="com.zimmem.meepo.DataSourceWrapper">
+		<property name="masterDataSource" ref="masterDatasource" />
+		<property name="slaveDataSrouces">
+			<list>
+				<ref bean="slaveDatasource1" />
+				<ref bean="slaveDatasource2" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="com.zimmem.meepo.MeepoDataSourceTransactionManager">
+		<property name="dataSourceWrapper" ref="dataSource" />
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean class="com.zimmem.meepo.sample.SelectService"></bean>
+
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="save*" read-only="false" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<aop:config>
+		<aop:pointcut id="allManagerMethod" expression="execution(* com.zimmem.meepo.sample.SelectService.*(..))" />
+		<aop:advisor pointcut-ref="allManagerMethod" advice-ref="txAdvice" />
+	</aop:config>
+</beans>
