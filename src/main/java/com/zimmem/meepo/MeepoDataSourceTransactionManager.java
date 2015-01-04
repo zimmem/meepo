@@ -57,6 +57,7 @@ public class MeepoDataSourceTransactionManager extends DataSourceTransactionMana
         super.doCleanupAfterCompletion(transaction);
         String uuid = clearKeyHolder.get();
         getDataSourceWrapper().clear(uuid);
+        clearKeyHolder.remove();
     }
 
     public DataSourceWrapper getDataSourceWrapper() {

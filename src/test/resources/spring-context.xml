@@ -36,6 +36,9 @@
 				<ref bean="slaveDatasource2" />
 			</list>
 		</property>
+		<property name="slaveChooseStrategy">
+			<bean class="com.zimmem.meepo.RandomSlaveStrategy"></bean>
+		</property>
 	</bean>
 
 	<bean id="transactionManager" class="com.zimmem.meepo.MeepoDataSourceTransactionManager">
@@ -64,6 +67,7 @@
 		<aop:pointcut id="allManagerMethod" expression="execution(* com.zimmem.meepo.sample.SelectService.*(..))" />
 		<aop:advisor pointcut-ref="allManagerMethod" advice-ref="txAdvice" />
 		<aop:aspect id="enforceMasterAspect" ref="enforceMasterStrategy" order="0">
+			<!-- 注意设置这里的 order ， 保证这个拦截在事务拦截之前 -->
 			<aop:around method="invoke" pointcut-ref="enforceMasterMethod" />
 			<aop:pointcut id="enforceMasterMethod" expression="execution(* com.zimmem.meepo.sample.SelectService.*(..))" />
 		</aop:aspect>

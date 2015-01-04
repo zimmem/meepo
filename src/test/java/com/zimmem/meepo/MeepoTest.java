@@ -32,7 +32,20 @@ public class MeepoTest {
         name = selectService.saveFromMaster();
         System.out.println("save from master, result = " + name);
 
+    }
+
+    @Test
+    public void testSelectFromSalve() {
+
+        String name = null;
+        int i = 10000000;
+        while (--i > 0) {
+            name = selectService.getFromSlave();
+            System.out.println("select from slave, result = " + name);
+        }
+
 
     }
+
 
 }

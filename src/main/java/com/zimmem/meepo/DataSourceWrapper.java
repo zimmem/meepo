@@ -24,6 +24,8 @@ public class DataSourceWrapper implements DataSource {
 
     private List<DataSource> slaveDataSrouces;
 
+    private SlaveChooseStrategy slaveChooseStrategy;
+
     private ThreadLocal<String> clearKey = new ThreadLocal<String>();
 
     public ThreadLocal<DataSource> dataSorceHolder = new ThreadLocal<DataSource>();
@@ -36,12 +38,12 @@ public class DataSourceWrapper implements DataSource {
         if (MasterSlaveStrategy.Role.Master == role) {
             dataSorceHolder.set(this.masterDataSource);
         } else {
-            dataSorceHolder.set(this.slaveDataSrouces.get(0));
+            dataSorceHolder.set(slaveChooseStrategy.choose(this.slaveDataSrouces));
         }
         this.clearKey.set(clearKey);
     }
 
-    void clear(String clearKey) {
+    public void clear(String clearKey) {
         if (clearKey != null && clearKey.equals(this.clearKey.get())) {
             this.dataSorceHolder.remove();
             this.clearKey.remove();
@@ -105,6 +107,14 @@ public class DataSourceWrapper implements DataSource {
 
     public void setSlaveDataSrouces(List<DataSource> slaveDataSrouces) {
         this.slaveDataSrouces = slaveDataSrouces;
+    }
+
+    public SlaveChooseStrategy getSlaveChooseStrategy() {
+        return slaveChooseStrategy;
+    }
+
+    public void setSlaveChooseStrategy(SlaveChooseStrategy slaveChooseStrategy) {
+        this.slaveChooseStrategy = slaveChooseStrategy;
     }
 
 }
