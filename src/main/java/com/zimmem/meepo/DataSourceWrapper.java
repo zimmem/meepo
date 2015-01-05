@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.slf4j.LoggerFactory;
+
 import com.zimmem.meepo.MasterSlaveStrategy.Role;
 
 /**
@@ -19,6 +21,8 @@ import com.zimmem.meepo.MasterSlaveStrategy.Role;
  * @author zhaowen.zhuang
  */
 public class DataSourceWrapper implements DataSource {
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(DataSourceWrapper.class);
 
     private DataSource masterDataSource;
 
@@ -37,16 +41,33 @@ public class DataSourceWrapper implements DataSource {
         Role role = strategy.select();
         if (MasterSlaveStrategy.Role.Master == role) {
             dataSorceHolder.set(this.masterDataSource);
+            if (log.isDebugEnabled()) {
+                log.debug("using master datasourc by strategy ({}) with clearKey {}", strategy
+                        .getClass().getName(), clearKey);
+            }
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("using slave datasourc by strategy ({}) with clearKey {}", strategy
+                        .getClass().getName(), clearKey);
+            }
             dataSorceHolder.set(slaveChooseStrategy.choose(this.slaveDataSrouces));
         }
         this.clearKey.set(clearKey);
     }
 
     public void clear(String clearKey) {
+
+        if (log.isTraceEnabled()) {
+            log.trace("try to clear dataSorceHolder with clearKey:{}", clearKey);
+        }
+
         if (clearKey != null && clearKey.equals(this.clearKey.get())) {
+
             this.dataSorceHolder.remove();
             this.clearKey.remove();
+            if (log.isDebugEnabled()) {
+                log.debug("clear dataSorceHolder with clearKey:{} success", clearKey);
+            }
         }
     }
 

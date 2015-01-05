@@ -49,7 +49,15 @@ public class MeepoDataSourceTransactionManager extends DataSourceTransactionMana
             }
 
         });
-        super.doBegin(transaction, definition);
+
+        try {
+            super.doBegin(transaction, definition);
+        } catch (Exception e) {
+            getDataSourceWrapper().clear(uuid);
+            clearKeyHolder.remove();
+            throw e;
+
+        }
     }
 
     @Override

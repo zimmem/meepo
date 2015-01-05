@@ -34,11 +34,11 @@ public class MeepoTest {
 
     }
 
-    @Test
+    //@Test
     public void testSelectFromSalve() {
 
         String name = null;
-        int i = 10000000;
+        int i = 100000;
         while (--i > 0) {
             name = selectService.getFromSlave();
             System.out.println("select from slave, result = " + name);
