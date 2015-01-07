@@ -16,7 +16,7 @@ Meepo 是游戏 Dota 中的一个英雄， 一般称狗头人或大忽悠。 它
 
 主要考虑的是开发人员在这种模式下怎么开发。
 
-大部分情况下， 很多人首先考虑到的是如何无感知， 透明的去访问。 个人认为先从应用场景来看是否确实有这个需求。 应该类型大致可以分为以下几中：
+大部分情况下， 很多人首先考虑到的是如何无感知， 透明的去访问。 个人认为先从应用场景来看是否确实有这个需求。 应该类型大致可以分为以下几种：
   
 - 运营后台， 一般只为 内部人员使用， 访问量低， 数据敏感高，  可以直连 master
 - 纯读的前台系统， 比如 社交的 timeline, 电商商品 detail 等等， 可以只连 slave ， 当然访问量非常大的情况下， 用 search ,  kv 等更合适， 关系看架构复杂度及性性价比。
@@ -33,6 +33,7 @@ Meppo 实现了以上这些需求~~
 
 比较熟知的方案都是架设一个中间代理， 解析 SQL 来确定 SQL 是读是写， 从而决定路由到主库还是从库。  
 比较出名的有  
+
 - mysql 自已的  mysql-proxy  
 - 阿里巴巴出品的  Amoeba  
 
@@ -43,7 +44,8 @@ Meepo 是怎么实现的？
 
 通过 `DataSourceWrapper` 代理 master/slave 对应的 DataSource, 当调用  getConnection 时根据上下文确定从哪个 DataSource 获取 Connection.
 目前有两个默认实现   
-- `MeepoDataSourceTransactionManager` 利用事务管理器， 当当前事务为只写事务时， 分配 slave connection ， 否则分配 master connection.  
+
+- `MeepoDataSourceTransactionManager` 利用事务管理器， 当当前事务为只读事务时， 分配 slave connection ， 否则分配 master connection.  
 - `EnforceMasterStrategy` 通过 AOP 实现， 当 service 方法上带有 `@EnforceMaster` 注解时， 强制分配主库， 否则分配从库  
 以上两个策略一般配合使用， 如需自定义策略， 可实现 `MasterSlaveStrategy` 接口。
 
